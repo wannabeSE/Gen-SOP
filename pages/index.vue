@@ -66,7 +66,7 @@
 
         <!-- Contact Form -->
         <Form
-          @submit.prevent="submitForm"
+          @submit="submitForm"
           class="space-y-6"
           :validation-schema="formSchema"
         >
@@ -76,12 +76,14 @@
             <div v-for="field in formFields" :key="field.fieldName">
               <FormField :fieldName="field.fieldName" :label="field.label">
                 <template #field="slotProps">
-                  <FormInput
-                    v-bind="slotProps"
-                    :name="field.fieldName"
-                    :placeholder="field.placeholder"
-                    :type="field.type"
-                  />
+                  <div class="w-full">
+                    <FormInput
+                      v-bind="slotProps"
+                      :name="field.fieldName"
+                      :placeholder="field.placeholder"
+                      :type="field.type"
+                    />
+                  </div>
                 </template>
               </FormField>
             </div>
@@ -116,20 +118,14 @@ interface FormField {
   type: string;
   placeholder: string;
 }
-// Form data
-const form = ref({
-  firstName: "",
-  lastName: "",
-  email: "",
-  phone: "",
-  pdfFile: null,
-});
 const formSchema: ObjectSchema<object> = object({
   firstName: string().required("First name is required"),
   lastName: string().required("Last name is required"),
   email: string().email("Invalid email").required("Email is required"),
   phone: string().min(11).required("Phone number is required"),
-  pdfFile: object().required("PDF file is required"),
+  ownUniversityName: string().min(10).required("University Name is required"),
+  degree: string().min(10).required("Degree is required"),
+  preferredUniversity: string().min(10).required("University Name is required"),
 });
 
 // dynamic form fields
@@ -158,6 +154,24 @@ const formFields: FormField[] = [
     type: "number",
     placeholder: "+91 9876543210",
   },
+  {
+    fieldName: "ownUniversityName",
+    label: "Your University Name",
+    type: "text",
+    placeholder: "University of Dhaka",
+  },
+  {
+    fieldName: "degree",
+    label: "Degree",
+    type: "text",
+    placeholder: "Bachelor of Science",
+  },
+  {
+    fieldName: "preferredUniversity",
+    label: "Preferred University",
+    type: "text",
+    placeholder: "University of Dhaka",
+  },
 ];
 // UI state
 const pdfFile = ref(null);
@@ -165,15 +179,8 @@ const updatePdfFile = (file: File) => {
   console.log(file);
 };
 // Form submission
-const submitForm = () => {
-  console.log("Form submitted:", form.value);
-  // Add your form submission logic here
-  // For file handling, you might need to use FormData
-  const formData = new FormData();
-  formData.append("firstName", form.value.firstName);
-  formData.append("lastName", form.value.lastName);
-  formData.append("email", form.value.email);
-  formData.append("phone", form.value.phone);
+const submitForm = (values: any) => {
+  console.log("Form submitted:", values);
 };
 </script>
 
