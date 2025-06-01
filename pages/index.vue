@@ -77,15 +77,14 @@
               <FormField :fieldName="field.fieldName" :label="field.label">
                 <template #field="slotProps">
                   <div class="w-full">
-
                     <FormInput
-                    v-bind="slotProps"
-                    :name="field.fieldName"
-                    :placeholder="field.placeholder"
-                    :type="field.type"
+                      v-bind="slotProps"
+                      :name="field.fieldName"
+                      :placeholder="field.placeholder"
+                      :type="field.type"
                     />
                   </div>
-                  </template>
+                </template>
               </FormField>
             </div>
           </div>
@@ -119,14 +118,6 @@ interface FormField {
   type: string;
   placeholder: string;
 }
-// Form data
-const form = ref({
-  firstName: "",
-  lastName: "",
-  email: "",
-  phone: "",
-  pdfFile: null,
-});
 const formSchema: ObjectSchema<object> = object({
   firstName: string().required("First name is required"),
   lastName: string().required("Last name is required"),
@@ -190,13 +181,6 @@ const updatePdfFile = (file: File) => {
 // Form submission
 const submitForm = (values: any) => {
   console.log("Form submitted:", values);
-  // Add your form submission logic here
-  // For file handling, you might need to use FormData
-  // const formData = new FormData();
-  // formData.append("firstName", form.value.firstName);
-  // formData.append("lastName", form.value.lastName);
-  // formData.append("email", form.value.email);
-  // formData.append("phone", form.value.phone);
 };
 </script>
 
