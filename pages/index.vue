@@ -65,69 +65,62 @@
         </h1>
 
         <!-- Contact Form -->
-        <form @submit.prevent="submitForm" class="space-y-6">
+        <Form
+          @submit.prevent="submitForm"
+          class="space-y-6"
+          :validation-schema="formSchema"
+        >
           <!-- First row - Name fields -->
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label
-                class="block text-gray-300 text-sm font-medium mb-2 text-left"
-              >
-                First name
-              </label>
-              <input
-                v-model="form.firstName"
-                type="text"
-                placeholder="Jonathan"
-                class="w-full px-4 py-3 bg-gray-800/50 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-              />
-            </div>
-            <div>
-              <label
-                class="block text-gray-300 text-sm font-medium mb-2 text-left"
-              >
-                Last name
-              </label>
-              <input
-                v-model="form.lastName"
-                type="text"
-                placeholder="James"
-                class="w-full px-4 py-3 bg-gray-800/50 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-              />
-            </div>
+            <FormField fieldName="firstName" label="First name">
+              <template #field="slotProps">
+                <FormInput
+                  v-bind="slotProps"
+                  name="firstName"
+                  placeholder="Jonathan"
+                />
+              </template>
+            </FormField>
+
+            <FormField fieldName="lastName" label="Last name">
+              <template #field="slotProps">
+                <FormInput
+                  v-bind="slotProps"
+                  name="lastName"
+                  placeholder="James"
+                />
+              </template>
+            </FormField>
           </div>
 
           <!-- Second row - Email and Phone -->
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label
-                class="block text-gray-300 text-sm font-medium mb-2 text-left"
-              >
-                Email
-              </label>
-              <input
-                v-model="form.email"
-                type="email"
-                placeholder="Jonathan2718@gmail.com"
-                class="w-full px-4 py-3 bg-gray-800/50 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-              />
-            </div>
-            <div>
-              <label
-                class="block text-gray-300 text-sm font-medium mb-2 text-left"
-              >
-                Phone number
-              </label>
-              <input
-                v-model="form.phone"
-                type="tel"
-                placeholder="+91 9876543210"
-                class="w-full px-4 py-3 bg-gray-800/50 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-              />
-            </div>
+            <FormField fieldName="email" label="Email">
+              <template #field="slotProps">
+                <FormInput
+                  v-bind="slotProps"
+                  name="email"
+                  placeholder="Jonathan2718@gmail.com"
+                />
+              </template>
+            </FormField>
+            <FormField fieldName="phone" label="Phone number">
+              <template #field="slotProps">
+                <FormInput
+                  v-bind="slotProps"
+                  name="phone"
+                  placeholder="+91 9876543210"
+                  type="number"
+                />
+              </template>
+            </FormField>
           </div>
 
           <!-- Upload CV/Resume PDF -->
-          <FileUpload v-model:pdfFile="pdfFile" @update:pdfFile="updatePdfFile" />
+          <FileUpload
+            v-model:pdfFile="pdfFile"
+            @update:pdfFile="updatePdfFile"
+          />
           <!-- Submit button -->
           <button
             type="submit"
@@ -135,15 +128,18 @@
           >
             Generate S.O.P
           </button>
-        </form>
+        </Form>
       </div>
     </main>
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
-import { FileUpload } from "~/components";
+import { FileUpload, FormField, FormInput } from "~/components";
+import { Form } from "vee-validate";
+import { object, ObjectSchema, string } from "yup";
+
 // Form data
 const form = ref({
   firstName: "",
@@ -152,13 +148,19 @@ const form = ref({
   phone: "",
   pdfFile: null,
 });
-
+const formSchema: ObjectSchema<object> = object({
+  firstName: string().required("First name is required"),
+  lastName: string().required("Last name is required"),
+  email: string().email("Invalid email").required("Email is required"),
+  phone: string()
+    .min(11)
+    .required("Phone number is required"),
+  pdfFile: object().required("PDF file is required"),
+});
 // UI state
-const dragover = ref(false);
-const fileUploaded = ref(false);
 const pdfFile = ref(null);
-const updatePdfFile = (file) => {
-    console.log(file);
+const updatePdfFile = (file: File) => {
+  console.log(file);
 };
 // Form submission
 const submitForm = () => {
@@ -170,9 +172,7 @@ const submitForm = () => {
   formData.append("lastName", form.value.lastName);
   formData.append("email", form.value.email);
   formData.append("phone", form.value.phone);
-
 };
-
 </script>
 
 <style scoped>
