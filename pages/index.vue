@@ -72,50 +72,20 @@
         >
           <!-- First row - Name fields -->
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <FormField fieldName="firstName" label="First name">
-              <template #field="slotProps">
-                <FormInput
-                  v-bind="slotProps"
-                  name="firstName"
-                  placeholder="Jonathan"
-                />
-              </template>
-            </FormField>
-
-            <FormField fieldName="lastName" label="Last name">
-              <template #field="slotProps">
-                <FormInput
-                  v-bind="slotProps"
-                  name="lastName"
-                  placeholder="James"
-                />
-              </template>
-            </FormField>
+            <!-- Dynamic form fields -->
+            <div v-for="field in formFields" :key="field.fieldName">
+              <FormField :fieldName="field.fieldName" :label="field.label">
+                <template #field="slotProps">
+                  <FormInput
+                    v-bind="slotProps"
+                    :name="field.fieldName"
+                    :placeholder="field.placeholder"
+                    :type="field.type"
+                  />
+                </template>
+              </FormField>
+            </div>
           </div>
-
-          <!-- Second row - Email and Phone -->
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <FormField fieldName="email" label="Email">
-              <template #field="slotProps">
-                <FormInput
-                  v-bind="slotProps"
-                  name="email"
-                  placeholder="Jonathan2718@gmail.com"
-                />
-              </template>
-            </FormField>
-            <FormField fieldName="phone" label="Phone number">
-              <template #field="slotProps">
-                <FormInput
-                  v-bind="slotProps"
-                  name="phone"
-                  placeholder="+91 9876543210"
-                  type="number"
-                />
-              </template>
-            </FormField>
-          </div>
-
           <!-- Upload CV/Resume PDF -->
           <FileUpload
             v-model:pdfFile="pdfFile"
@@ -140,6 +110,12 @@ import { FileUpload, FormField, FormInput } from "~/components";
 import { Form } from "vee-validate";
 import { object, ObjectSchema, string } from "yup";
 
+interface FormField {
+  fieldName: string;
+  label: string;
+  type: string;
+  placeholder: string;
+}
 // Form data
 const form = ref({
   firstName: "",
@@ -152,11 +128,37 @@ const formSchema: ObjectSchema<object> = object({
   firstName: string().required("First name is required"),
   lastName: string().required("Last name is required"),
   email: string().email("Invalid email").required("Email is required"),
-  phone: string()
-    .min(11)
-    .required("Phone number is required"),
+  phone: string().min(11).required("Phone number is required"),
   pdfFile: object().required("PDF file is required"),
 });
+
+// dynamic form fields
+const formFields: FormField[] = [
+  {
+    fieldName: "firstName",
+    label: "First name",
+    type: "text",
+    placeholder: "Jonathan",
+  },
+  {
+    fieldName: "lastName",
+    label: "Last name",
+    type: "text",
+    placeholder: "James",
+  },
+  {
+    fieldName: "email",
+    label: "Email",
+    type: "email",
+    placeholder: "Jonathan2718@gmail.com",
+  },
+  {
+    fieldName: "phone",
+    label: "Phone number",
+    type: "number",
+    placeholder: "+91 9876543210",
+  },
+];
 // UI state
 const pdfFile = ref(null);
 const updatePdfFile = (file: File) => {
